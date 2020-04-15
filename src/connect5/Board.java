@@ -3,9 +3,7 @@ package connect5;
 
 import java.util.ArrayList;
 
-import gui.Gui;
-
-
+// Class responsible for calculating the best move evaluating the board and deciding who is playing
 public class Board {
 	
 
