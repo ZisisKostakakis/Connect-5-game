@@ -13,12 +13,11 @@ import javax.swing.JOptionPane;
 import connect5.Constants;
 import connect5.GameParameters;
 
-
+// Class responsible for the drop down menus and for choosing and implementing the correct options in the gui
 public class SettingsWindow extends JFrame {
 	
-	/**
-	 * 
-	 */
+	
+	private static final long serialVersionUID = 4640146997231727713L;
 	
 	private JLabel gameModeLabel;
 	private JLabel maxDepth1Label;

@@ -1,5 +1,6 @@
 package connect5;
 
+// Class for final public variables used in the game
 
 public class Constants {
 	//Pause
@@ -15,7 +16,7 @@ public class Constants {
 	public static final int Player2 = -1;  // Player 2
 	public static final int EMPTY = 0;
 	public static String line = null;
-	public static boolean is_gameover = false;	
+	public static  boolean is_gameover = false;	
 	// GUI styles
 	public static final int SystemStyle = 1;
 	public static final int CrossPlatformStyle = 2;
@@ -38,5 +39,9 @@ public class Constants {
 	public static final int HumanVsHuman = 2;
 	public static final int AiVsAi = 3;
 	public static final int AiVsHuman = 4;
+	
+	//Gui configurations
+	public static final int DEFAULT_WIDTH = 650;
+	public static final int DEFAULT_HEIGHT = 600;
 	
 }

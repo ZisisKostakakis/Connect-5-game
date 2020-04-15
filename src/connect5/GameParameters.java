@@ -3,10 +3,10 @@ package connect5;
 
 public class GameParameters {
 	
-	/* Default values */
+	// Game parameters for the game settings
 	
-	public static int gameMode = Constants.AiVsAi; // value is 1
-	public static int maxDepth1 = 1;
+	public static int gameMode = Constants.HumanVsAi; // value is 1
+	public static int maxDepth1 = 4;
 	public static int maxDepth2 = 4;
 	public static int player1Color = Constants.RED;
 	public static int player2Color = Constants.YELLOW;
