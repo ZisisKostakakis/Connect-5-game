@@ -15,16 +15,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-import javax.imageio.IIOException;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,9 +31,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
+
 
 import connect5.Board;
 import connect5.Constants;
@@ -126,6 +119,7 @@ public class Gui {
 	
 	
 	// Adds the menu bars and items to the window.
+	
 	private static void AddMenus() {
 		
 		// Adding the menu bar
@@ -179,7 +173,8 @@ public class Gui {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
 						"You can either click the buttons or press 1-8 on your keyboard to insert a new checker."
-						+ "\nTo win you must place 5 checkers in an row, vertically, diagonally or horizontally.",
+						+ "\nTo win you must place 5 checkers in an row, vertically, diagonally or horizontally."
+						+" KeyBoard Input ctrl + N = New Game",
 						"How to Play", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
@@ -187,7 +182,7 @@ public class Gui {
 		about_Item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,
-						"Created By Zisis Kostakakis",
+						"Created By 31540",
 						"About", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
@@ -203,6 +198,7 @@ public class Gui {
 	
 	
 	// This is the main Connect-5 board.
+	// Image, Dimensions and Icons
 	public static JLayeredPane create_Layered_Board() {
 		layered_Game_Board = new JLayeredPane();
 		layered_Game_Board.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -217,7 +213,7 @@ public class Gui {
 		return layered_Game_Board;
 	}
 	
-	
+	// Keyboard input function
 	public static KeyListener gameKeyListener = new KeyListener() {
 		@Override
 		public void keyTyped(KeyEvent e) {
@@ -266,6 +262,7 @@ public class Gui {
 			if (button.equals("1") || button.equals("2") || button.equals("3") || button.equals("4")
 					|| button.equals("5") || button.equals("6") || button.equals("7") || button.equals("8")) {
 				if (!board.has_Overflow_Occured()) {
+					boolean is_gameover = game();
 					if(GameParameters.gameMode == Constants.HumanVsHuman)
 					{
 						if(Constants.firstPlayer == true){
@@ -280,10 +277,9 @@ public class Gui {
 						}
 					}
 
-					Constants.is_gameover =	game();
 					save_Undo_Move();
 					
-					if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+					if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 						Constants.COUNT1++;
 						Constants.COUNT2 ++;
 						ai_Move(ai);
@@ -302,7 +298,7 @@ public class Gui {
 	};
 	
 	
-	
+	// Undo implementation working for every mode except AI vs AI
 	private static void undo() {
 		// This is the undo implementation for Human VS Human mode.
 		if (GameParameters.gameMode == Constants.HumanVsHuman) {
@@ -326,14 +322,13 @@ public class Gui {
 					Constants.COUNT2 --;
 					player2_turn.setText("Player 2 turn : " + Constants.COUNT2);
 					Constants.firstPlayer = false;
-					System.out.println(i);
 					}
 				else if(i >=0 && Constants.firstPlayer == false){
 					i--;
 				Constants.COUNT1--;
 				player1_turn.setText("Player 1 turn : " + Constants.COUNT2);
 				Constants.firstPlayer = true;
-				System.out.println(i);
+			
 				}
 				
 			} catch (ArrayIndexOutOfBoundsException ex) {
@@ -364,13 +359,12 @@ public class Gui {
 				i--;
 				Constants.COUNT1 --;
 				player1_turn.setText("Player 1 turn : " + Constants.COUNT1);
-				System.out.println(i);
+				
 				}
 				if(ii>=0){
 					ii--;
 					Constants.COUNT2--;
 					player2_turn.setText("Player 2 turn : " + Constants.COUNT2);
-					System.out.println(ii);
 				}
 								
 			} catch (EmptyStackException | ArrayIndexOutOfBoundsException ex) {
@@ -398,6 +392,7 @@ public class Gui {
 		
 		if (frame_Main_Window != null) frame_Main_Window.dispose();
 		frame_Main_Window = new JFrame("Connect-5");
+		
 		// make the main window appear on the center
 		center_Window(frame_Main_Window, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		Component compMainWindowContents = create_Content_Components();
@@ -416,9 +411,7 @@ public class Gui {
 		frame_Main_Window.pack();
 		
 		AddMenus();
-		
-		
-		
+		// If statement. Depending on the game mode do the appropriate actions		
 		if (GameParameters.gameMode == Constants.HumanVsAi) {
 			Constants.COUNT1 =0;
 			Constants.COUNT2 =0;
@@ -427,9 +420,7 @@ public class Gui {
 			Full_Speed.setVisible(false);
 			ai = new MiniMaxAi(GameParameters.maxDepth1, Constants.Player2);
 			}
-		
-							
-				
+					
 		else if ( GameParameters.gameMode == Constants.AiVsHuman)	{
 			Constants.COUNT1 =0;
 			Constants.COUNT2 =0;
@@ -443,6 +434,9 @@ public class Gui {
 				}
 		else if ( GameParameters.gameMode == Constants.HumanVsHuman){
 				Full_Speed.setVisible(false);
+				Constants.COUNT1 =0;
+				Constants.COUNT2 =0;
+				player1_turn.setText("Player 1 turn : " +Constants.COUNT1);
 		}
 			
 		
@@ -460,13 +454,14 @@ public class Gui {
 			frame_Main_Window.paint(frame_Main_Window.getGraphics());
 		 
 			
-			
+			// Automatic function working for AI vs AI
 					Full_Speed.addActionListener(new ActionListener(){
 						public void actionPerformed(ActionEvent e){
+							Constants.is_gameover = board.check_Game_Over();
 							
 							while(!Constants.is_gameover){
 								 try{
-									 //Thread.sleep(500);
+									 Thread.sleep(500);
 									 ai_Move(ai1);
 									 Constants.COUNT1++;
 									 player1_turn.setText("Player 1 turn : " + Constants.COUNT1);
@@ -477,7 +472,7 @@ public class Gui {
 								 }
 								 if(!Constants.is_gameover){
 									 try{
-										 //Thread.sleep(500);
+										 Thread.sleep(500);
 											ai_Move(ai2);
 											Constants.COUNT2++;
 											player2_turn.setText("Player 2 turn : " + Constants.COUNT2);
@@ -507,7 +502,7 @@ public class Gui {
 	// It finds which player plays next and makes a move on the board.
 	public static void make_Move(int col) {
 		board.set_Overflow_Occured(false);
-		
+		// using values from board class
 		int previousRow = board.getLastMove().getRow();
 		int previousCol = board.getLastMove().getCol();
 		int previousLetter = board.getLastSymbolPlayed();
@@ -539,7 +534,8 @@ public class Gui {
 	
 	}
 	
-	
+	// Saving the last move for each player or AI in order to use the method undo
+	// Saving in array and stack for checker symbols
 	public static void save_Undo_Move() {
 		
 		human_player_undo_row = board.getLastMove().getRow();
@@ -572,8 +568,9 @@ public class Gui {
 	}
 	
 	// Gets called after makeMove(int, col) is called.
+	// Controlling the flow of the game and deciding where to place the checker
 	public static boolean game() {
-		Constants.is_gameover = board.check_Game_Over();
+	
 		int row = board.getLastMove().getRow();
 		int col = board.getLastMove().getCol();
 		int currentPlayer = board.getLastSymbolPlayed();
@@ -588,24 +585,27 @@ public class Gui {
 			place_Checker(GameParameters.player2Color, row, col);
 		}
 		
-		if (Constants.is_gameover) {
+		boolean is_gameover = board.check_Game_Over();
+		if (is_gameover) {
 			game_Over();
 		}
 		
 		
 		
 		undo_Item.setEnabled(true);
-		return Constants.is_gameover;
+		return is_gameover;
 	}
 	
 	
-	// Gets called after the human player makes a move. It makes a Minimax AI move.
+	// Gets called after the human player makes a move. It makes a Min-max AI move.
 	public static void ai_Move(MiniMaxAi ai){
+
 		Move aiMove = ai.miniMax(board);
 		board.make_Move(aiMove.getCol(), ai.getAiLetter());
 		Constants.is_gameover=game();
 		
 	}
+	// Button settings ( Coloring, Visibility, Enabling and Disabling )
 	public static void set_Color(){
 		column1_button.setBackground(Color.white);
 		column2_button.setBackground(Color.white);
@@ -720,10 +720,9 @@ public class Gui {
 		if (GameParameters.gameMode != Constants.AiVsAi)
 			enable_Buttons();
 		
-		
+		// Button and actions for each
 		if (firstGame) {
-			Constants.COUNT1 = 0;
-			Constants.COUNT2 = 0;
+			
 		
 			column1_button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -731,7 +730,7 @@ public class Gui {
 					make_Move(0);
 					
 					if (!board.has_Overflow_Occured()) {
-					
+					boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -746,10 +745,9 @@ public class Gui {
 							}
 							
 						}
-						Constants.is_gameover =	game();
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&&!is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -769,6 +767,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(1);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -782,10 +781,10 @@ public class Gui {
 								Constants.firstPlayer = true;
 							}
 						}
-						Constants.is_gameover =	game();
+					
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {		
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {		
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -803,6 +802,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(2);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -817,10 +817,10 @@ public class Gui {
 							}
 						}
 
-						Constants.is_gameover =	game();
+					
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -838,6 +838,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(3);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -852,10 +853,10 @@ public class Gui {
 							}
 						}
 
-						Constants.is_gameover =	game();
+						
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -873,6 +874,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(4);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -886,10 +888,9 @@ public class Gui {
 								Constants.firstPlayer = true;
 							}
 						}
-						Constants.is_gameover =	game();
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -907,6 +908,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(5);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -921,10 +923,10 @@ public class Gui {
 							}
 						}
 
-						Constants.is_gameover =	game();
+			
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -942,6 +944,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(6);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -956,10 +959,9 @@ public class Gui {
 							}
 						}
 
-						Constants.is_gameover =	game();
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -977,6 +979,7 @@ public class Gui {
 				public void actionPerformed(ActionEvent e) {
 					make_Move(7);
 					if (!board.has_Overflow_Occured()) {
+						boolean is_gameover = game();
 						if(GameParameters.gameMode == Constants.HumanVsHuman)
 						{
 							if(Constants.firstPlayer == true){
@@ -991,10 +994,10 @@ public class Gui {
 							}
 						}
 
-						Constants.is_gameover =	game();
+						
 						save_Undo_Move();
 						
-						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !Constants.is_gameover) {	
+						if ((GameParameters.gameMode == Constants.HumanVsAi || GameParameters.gameMode == Constants.AiVsHuman )&& !is_gameover) {	
 							Constants.COUNT1++;
 							Constants.COUNT2 ++;
 							ai_Move(ai);
@@ -1016,6 +1019,9 @@ public class Gui {
 							"Pause", JOptionPane.PLAIN_MESSAGE);
 					disable_Buttons();
 					start.setEnabled(true);
+					frame_Main_Window.removeKeyListener(gameKeyListener);
+					undo_Item.setEnabled(false);
+					start.setEnabled(true);
 
 					
 				}});
@@ -1025,6 +1031,8 @@ public class Gui {
 								"Game resumed the buttons will appear",
 								"Resume",JOptionPane.PLAIN_MESSAGE);
 						enable_Buttons();
+						frame_Main_Window.addKeyListener(gameKeyListener);
+						start.setEnabled(false);
 					}
 				});
 				
@@ -1071,6 +1079,7 @@ public class Gui {
 	// It gets called only of the game is over.
 	// We can check if the game is over by calling the method "checkGameOver()"
 	// of the class "Board".
+	// Choosing appropriate message and reset the game or quit
 	public static void game_Over() {
 		board.set_Game_Over(true);
 		int choice =0;
@@ -1129,15 +1138,16 @@ public class Gui {
 					"Game is Over",JOptionPane.PLAIN_MESSAGE);
 			// Remove key listener
 			
-			frame_Main_Window.removeKeyListener(frame_Main_Window.getKeyListeners()[0]);
-			Full_Speed.removeActionListener(null);
+			frame_Main_Window.removeKeyListener(gameKeyListener);
+		
 
 		}
 	}
 	
-
+	// Suppress the warning
 	@SuppressWarnings("static-access")
-
+	
+	// Main class
 	public static void main(String[] args){
 		Gui connect5 = new Gui();
 		connect5.create_New_Game();
