@@ -710,7 +710,7 @@ public class Gui {
 		
 		// Create a panel to set up the board buttons.
 		panel_Board_Numbers = new JPanel();
-		panel_Board_Numbers.setLayout(new GridLayout(1, 7, 6, 4));
+		panel_Board_Numbers.setLayout(new GridLayout(1, 7, -6, 4));
 		panel_Board_Numbers.setBorder(BorderFactory.createEmptyBorder(2,22, 2,22));
 		
 		panel_AIvsAI = new JPanel();
